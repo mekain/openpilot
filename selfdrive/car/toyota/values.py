@@ -327,6 +327,7 @@ class CAR(Platforms):
     ],
     CarSpecs(mass=4481. * CV.LB_TO_KG, wheelbase=2.79, steerRatio=16., tireStiffnessFactor=0.5533),
     dbc_dict('toyota_tnga_k_pt_generated', 'toyota_adas'),
+
   )
   LEXUS_RX_TSS2 = ToyotaTSS2PlatformConfig(
     [
