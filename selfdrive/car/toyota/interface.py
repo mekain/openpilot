@@ -109,6 +109,7 @@ class CarInterface(CarInterfaceBase):
     if ret.flags & ToyotaFlags.SNG_WITHOUT_DSU:
       stop_and_go = stop_and_go or bool(ret.flags & ToyotaFlags.SMART_DSU.value) or (ret.enableDsu and not docs)
 
+    stop_and_go = stop_and_go or bool(0x2FF in fingerprint[0] and 0x2AA in fingerprint[0])
     ret.centerToFront = ret.wheelbase * 0.44
 
     # TODO: Some TSS-P platforms have BSM, but are flipped based on region or driving direction.
@@ -262,7 +263,7 @@ class CarInterface(CarInterfaceBase):
       if self.CS.low_speed_lockout:
         events.add(EventName.lowSpeedLockout)
       if ret.vEgo < self.CP.minEnableSpeed:
-        events.add(EventName.belowEngageSpeed)
+        pass#events.add(EventName.belowEngageSpeed)
         if c.actuators.accel > 0.3:
           # some margin on the actuator to not false trigger cancellation while stopping
           events.add(EventName.speedTooLow)
