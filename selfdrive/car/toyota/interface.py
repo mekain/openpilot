@@ -262,7 +262,7 @@ class CarInterface(CarInterfaceBase):
       if self.CS.low_speed_lockout:
         events.add(EventName.lowSpeedLockout)
       if ret.vEgo < self.CP.minEnableSpeed:
-        events.add(EventName.belowEngageSpeed)
+        pass#events.add(EventName.belowEngageSpeed)
         if c.actuators.accel > 0.3:
           # some margin on the actuator to not false trigger cancellation while stopping
           events.add(EventName.speedTooLow)
