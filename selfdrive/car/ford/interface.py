@@ -50,12 +50,12 @@ class CarInterface(CarInterfaceBase):
       pscm_config = next((fw for fw in car_fw if fw.ecu == Ecu.eps and b'\x22\xDE\x01' in fw.request), None)
       if pscm_config:
         if len(pscm_config.fwVersion) != 24:
-          ret.dashcamOnly = True
+          ret.dashcamOnly = False
         else:
           config_tja = pscm_config.fwVersion[7]  # Traffic Jam Assist
           config_lca = pscm_config.fwVersion[8]  # Lane Centering Assist
           if config_tja != 0xFF or config_lca != 0xFF:
-            ret.dashcamOnly = True
+            ret.dashcamOnly = False
 
     # Auto Transmission: 0x732 ECU or Gear_Shift_by_Wire_FD1
     found_ecus = [fw.ecu for fw in car_fw]
