@@ -3,8 +3,7 @@
 #include <memory>
 
 #include <QOpenGLContext>
-#include <QMapLibre/Map>
-#include <QMapLibre/Settings>
+#include <QMapboxGL>
 #include <QTimer>
 #include <QGeoCoordinate>
 #include <QOpenGLBuffer>
@@ -12,7 +11,7 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFramebufferObject>
 
-#include "msgq/visionipc/visionipc_server.h"
+#include "cereal/visionipc/visionipc_server.h"
 #include "cereal/messaging/messaging.h"
 
 
@@ -20,7 +19,7 @@ class MapRenderer : public QObject {
   Q_OBJECT
 
 public:
-  MapRenderer(const QMapLibre::Settings &, bool online=true);
+  MapRenderer(const QMapboxGLSettings &, bool online=true);
   uint8_t* getImage();
   void update();
   bool loaded();
@@ -38,8 +37,8 @@ private:
   void publish(const double render_time, const bool loaded);
   void sendThumbnail(const uint64_t ts, const kj::Array<capnp::byte> &buf);
 
-  QMapLibre::Settings m_settings;
-  QScopedPointer<QMapLibre::Map> m_map;
+  QMapboxGLSettings m_settings;
+  QScopedPointer<QMapboxGL> m_map;
 
   void initLayers();
 
@@ -53,7 +52,7 @@ private:
   bool ever_loaded = false;
 
 public slots:
-  void updatePosition(QMapLibre::Coordinate position, float bearing);
+  void updatePosition(QMapbox::Coordinate position, float bearing);
   void updateRoute(QList<QGeoCoordinate> coordinates);
   void msgUpdate();
 };

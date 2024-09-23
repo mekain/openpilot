@@ -9,10 +9,11 @@ import logging
 import threading
 from contextlib import contextmanager
 from functools import reduce
-from collections.abc import Callable
+from typing import Callable, List, Optional
 
 from .base import BaseHandle, BaseSTBootloaderHandle, TIMEOUT
 from .constants import McuType, MCU_TYPE_BY_IDCODE, USBPACKET_MAX_SIZE
+from .utils import crc8_pedal
 
 try:
   import spidev
@@ -32,20 +33,6 @@ MAX_XFER_RETRY_COUNT = 5
 XFER_SIZE = 0x40*31
 
 DEV_PATH = "/dev/spidev0.0"
-
-
-def crc8(data):
-  crc = 0xFF    # standard init value
-  poly = 0xD5   # standard crc8: x8+x7+x6+x4+x2+1
-  size = len(data)
-  for i in range(size - 1, -1, -1):
-    crc ^= data[i]
-    for _ in range(8):
-      if ((crc & 0x80) != 0):
-        crc = ((crc << 1) ^ poly) & 0xFF
-      else:
-        crc <<= 1
-  return crc
 
 
 class PandaSpiException(Exception):
@@ -251,7 +238,7 @@ class PandaSpiHandle(BaseHandle):
         version_bytes = spi.readbytes(len(vers_str) + 2)
         if bytes(version_bytes).startswith(vers_str):
           break
-        if (time.monotonic() - start) > 0.001:
+        if (time.monotonic() - start) > 0.01:
           raise PandaSpiMissingAck
 
       rlen = struct.unpack("<H", bytes(version_bytes[-2:]))[0]
@@ -261,7 +248,7 @@ class PandaSpiHandle(BaseHandle):
       # get response
       dat = spi.readbytes(rlen + 1)
       resp = dat[:-1]
-      calculated_crc = crc8(bytes(version_bytes + resp))
+      calculated_crc = crc8_pedal(bytes(version_bytes + resp))
       if calculated_crc != dat[-1]:
         raise PandaSpiBadChecksum
       return bytes(resp)
@@ -319,7 +306,7 @@ class STBootloaderSPIHandle(BaseSTBootloaderHandle):
       with self.dev.acquire() as spi:
         spi.xfer([self.SYNC, ])
         try:
-          self._get_ack(spi, 0.1)
+          self._get_ack(spi)
         except (PandaSpiNackResponse, PandaSpiMissingAck):
           # NACK ok here, will only ACK the first time
           pass
@@ -333,7 +320,7 @@ class STBootloaderSPIHandle(BaseSTBootloaderHandle):
     start_time = time.monotonic()
     while data not in (self.ACK, self.NACK) and (time.monotonic() - start_time < timeout):
       data = spi.xfer([0x00, ])[0]
-      time.sleep(0)
+      time.sleep(0.001)
     spi.xfer([self.ACK, ])
 
     if data == self.NACK:
@@ -341,13 +328,13 @@ class STBootloaderSPIHandle(BaseSTBootloaderHandle):
     elif data != self.ACK:
       raise PandaSpiMissingAck
 
-  def _cmd_no_retry(self, cmd: int, data: list[bytes] | None = None, read_bytes: int = 0, predata=None) -> bytes:
+  def _cmd_no_retry(self, cmd: int, data: Optional[List[bytes]] = None, read_bytes: int = 0, predata=None) -> bytes:
     ret = b""
     with self.dev.acquire() as spi:
       # sync + command
       spi.xfer([self.SYNC, ])
       spi.xfer([cmd, cmd ^ 0xFF])
-      self._get_ack(spi, timeout=0.01)
+      self._get_ack(spi, timeout=0.1)
 
       # "predata" - for commands that send the first data without a checksum
       if predata is not None:
@@ -371,7 +358,7 @@ class STBootloaderSPIHandle(BaseSTBootloaderHandle):
 
     return bytes(ret)
 
-  def _cmd(self, cmd: int, data: list[bytes] | None = None, read_bytes: int = 0, predata=None) -> bytes:
+  def _cmd(self, cmd: int, data: Optional[List[bytes]] = None, read_bytes: int = 0, predata=None) -> bytes:
     exc = PandaSpiException()
     for n in range(MAX_XFER_RETRY_COUNT):
       try:

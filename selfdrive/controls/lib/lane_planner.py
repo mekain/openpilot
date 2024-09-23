@@ -4,7 +4,7 @@ from openpilot.common.filter_simple import FirstOrderFilter
 from openpilot.common.numpy_fast import interp
 from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
-from openpilot.common.swaglog import cloudlog
+from openpilot.system.swaglog import cloudlog
 
 
 TRAJECTORY_SIZE = 33
@@ -71,8 +71,8 @@ class LanePlanner:
 
     desire_state = md.meta.desireState
     if len(desire_state):
-      self.l_lane_change_prob = desire_state[log.Desire.laneChangeLeft]
-      self.r_lane_change_prob = desire_state[log.Desire.laneChangeRight]
+      self.l_lane_change_prob = desire_state[log.LateralPlan.Desire.laneChangeLeft]
+      self.r_lane_change_prob = desire_state[log.LateralPlan.Desire.laneChangeRight]
 
   def get_d_path(self, v_ego, path_t, path_xyz):
     # Reduce reliance on lanelines that are too far apart or

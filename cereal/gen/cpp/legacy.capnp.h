@@ -6,14 +6,10 @@
 #include <capnp/generated-header-support.h>
 #include <kj/windows-sanity.h>
 
-#ifndef CAPNP_VERSION
-#error "CAPNP_VERSION is not defined, is capnp/generated-header-support.h missing?"
-#elif CAPNP_VERSION != 1000002
+#if CAPNP_VERSION != 8000
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
-
-CAPNP_BEGIN_HEADER
 
 namespace capnp {
 namespace schemas {
@@ -11410,6 +11406,4 @@ inline ::capnp::Orphan< ::capnp::Data> LidarPts::Builder::disownPkt() {
 }
 
 }  // namespace
-
-CAPNP_END_HEADER
 

@@ -1,5 +1,5 @@
 from openpilot.selfdrive.controls.lib.sunnypilot import DEBUG, SpeedLimitControlState
-from openpilot.common.swaglog import cloudlog
+from openpilot.system.swaglog import cloudlog
 
 
 def debug(msg):

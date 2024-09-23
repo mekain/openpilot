@@ -6,14 +6,10 @@
 #include <capnp/generated-header-support.h>
 #include <kj/windows-sanity.h>
 
-#ifndef CAPNP_VERSION
-#error "CAPNP_VERSION is not defined, is capnp/generated-header-support.h missing?"
-#elif CAPNP_VERSION != 1000002
+#if CAPNP_VERSION != 8000
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
-
-CAPNP_BEGIN_HEADER
 
 namespace capnp {
 namespace schemas {
@@ -53,7 +49,7 @@ enum class EventName_baa8c5d505f727de: uint16_t {
   PARK_BRAKE,
   MANUAL_RESTART,
   LOW_SPEED_LOCKOUT,
-  PLANNER_ERROR_D_E_P_R_E_C_A_T_E_D,
+  PLANNER_ERROR,
   IPAS_OVERRIDE_D_E_P_R_E_C_A_T_E_D,
   JOYSTICK_DEBUG,
   STEER_TEMP_UNAVAILABLE_SILENT,
@@ -115,7 +111,7 @@ enum class EventName_baa8c5d505f727de: uint16_t {
   FAN_MALFUNCTION,
   CAMERA_MALFUNCTION,
   MODEL_LAG_WARNING_D_E_P_R_E_C_A_T_E_D,
-  GPS_MALFUNCTION_D_E_P_R_E_C_A_T_E_D,
+  GPS_MALFUNCTION,
   PROCESS_NOT_RUNNING,
   DASHCAM_MODE,
   STARTUP_FUZZY_FINGERPRINT_D_E_P_R_E_C_A_T_E_D,
@@ -141,7 +137,6 @@ enum class EventName_baa8c5d505f727de: uint16_t {
   CALIBRATION_RECALIBRATING,
   LOCATIOND_PERMANENT_ERROR,
   PARAMSD_PERMANENT_ERROR,
-  ACTUATORS_API_UNAVAILABLE,
   MANUAL_STEERING_REQUIRED,
   MANUAL_LONGITUDINAL_REQUIRED,
   SILENT_PEDAL_PRESSED,
@@ -248,7 +243,6 @@ enum class AudibleAlert_f5a5e26c954e339e: uint16_t {
   PROMPT_SINGLE_HIGH,
 };
 CAPNP_DECLARE_ENUM(AudibleAlert, f5a5e26c954e339e);
-CAPNP_DECLARE_SCHEMA(d817d6655115ca85);
 CAPNP_DECLARE_SCHEMA(8c69372490aaa9da);
 CAPNP_DECLARE_SCHEMA(e836349c6056b0c9);
 CAPNP_DECLARE_SCHEMA(b581b23b1c89dda3);
@@ -289,15 +283,13 @@ enum class SafetyModel_95551e5b1edaf451: uint16_t {
   BODY,
   HYUNDAI_CANFD,
   VOLKSWAGEN_MQB_EVO,
-  CHRYSLER_CUSW,
-  PSA,
 };
 CAPNP_DECLARE_ENUM(SafetyModel, 95551e5b1edaf451);
 CAPNP_DECLARE_SCHEMA(d661512be2def77f);
 enum class SteerControlType_d661512be2def77f: uint16_t {
   TORQUE,
   ANGLE,
-  CURVATURE_D_E_P_R_E_C_A_T_E_D,
+  CURVATURE,
 };
 CAPNP_DECLARE_ENUM(SteerControlType, d661512be2def77f);
 CAPNP_DECLARE_SCHEMA(8f162eeb14bfc0ec);
@@ -390,7 +382,7 @@ struct CarState {
   struct ButtonEvent;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(9da4fa09e052903c, 10, 7)
+    CAPNP_DECLARE_STRUCT_HEADER(9da4fa09e052903c, 9, 7)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -555,21 +547,6 @@ struct CarControl::HUDControl {
 
   struct _capnpPrivate {
     CAPNP_DECLARE_STRUCT_HEADER(d895c87c4eb03a38, 2, 0)
-    #if !CAPNP_LITE
-    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
-    #endif  // !CAPNP_LITE
-  };
-};
-
-struct CarOutput {
-  CarOutput() = delete;
-
-  class Reader;
-  class Builder;
-  class Pipeline;
-
-  struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(d817d6655115ca85, 0, 1)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -1000,12 +977,6 @@ public:
 
   inline bool getCarFaultedNonCritical() const;
 
-  inline  ::uint32_t getCanErrorCounter() const;
-
-  inline bool getCanRcvTimeoutDEPRECATED() const;
-
-  inline float getCumLagMs() const;
-
   inline bool getMadsEnabled() const;
 
   inline bool getLeftBlinkerOn() const;
@@ -1224,15 +1195,6 @@ public:
 
   inline bool getCarFaultedNonCritical();
   inline void setCarFaultedNonCritical(bool value);
-
-  inline  ::uint32_t getCanErrorCounter();
-  inline void setCanErrorCounter( ::uint32_t value);
-
-  inline bool getCanRcvTimeoutDEPRECATED();
-  inline void setCanRcvTimeoutDEPRECATED(bool value);
-
-  inline float getCumLagMs();
-  inline void setCumLagMs(float value);
 
   inline bool getMadsEnabled();
   inline void setMadsEnabled(bool value);
@@ -1935,8 +1897,8 @@ public:
 
   inline float getPitchDEPRECATED() const;
 
-  inline bool hasActuatorsOutputDEPRECATED() const;
-  inline  ::cereal::CarControl::Actuators::Reader getActuatorsOutputDEPRECATED() const;
+  inline bool hasActuatorsOutput() const;
+  inline  ::cereal::CarControl::Actuators::Reader getActuatorsOutput() const;
 
   inline bool getLatActive() const;
 
@@ -2024,12 +1986,12 @@ public:
   inline float getPitchDEPRECATED();
   inline void setPitchDEPRECATED(float value);
 
-  inline bool hasActuatorsOutputDEPRECATED();
-  inline  ::cereal::CarControl::Actuators::Builder getActuatorsOutputDEPRECATED();
-  inline void setActuatorsOutputDEPRECATED( ::cereal::CarControl::Actuators::Reader value);
-  inline  ::cereal::CarControl::Actuators::Builder initActuatorsOutputDEPRECATED();
-  inline void adoptActuatorsOutputDEPRECATED(::capnp::Orphan< ::cereal::CarControl::Actuators>&& value);
-  inline ::capnp::Orphan< ::cereal::CarControl::Actuators> disownActuatorsOutputDEPRECATED();
+  inline bool hasActuatorsOutput();
+  inline  ::cereal::CarControl::Actuators::Builder getActuatorsOutput();
+  inline void setActuatorsOutput( ::cereal::CarControl::Actuators::Reader value);
+  inline  ::cereal::CarControl::Actuators::Builder initActuatorsOutput();
+  inline void adoptActuatorsOutput(::capnp::Orphan< ::cereal::CarControl::Actuators>&& value);
+  inline ::capnp::Orphan< ::cereal::CarControl::Actuators> disownActuatorsOutput();
 
   inline bool getLatActive();
   inline void setLatActive(bool value);
@@ -2083,7 +2045,7 @@ public:
   inline  ::cereal::CarControl::CruiseControl::Pipeline getCruiseControl();
   inline  ::cereal::CarControl::HUDControl::Pipeline getHudControl();
   inline  ::cereal::CarControl::Actuators::Pipeline getActuators();
-  inline  ::cereal::CarControl::Actuators::Pipeline getActuatorsOutputDEPRECATED();
+  inline  ::cereal::CarControl::Actuators::Pipeline getActuatorsOutput();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2341,8 +2303,6 @@ public:
 
   inline bool getLeftLaneDepart() const;
 
-  inline  ::int8_t getLeadDistanceBars() const;
-
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -2401,9 +2361,6 @@ public:
   inline bool getLeftLaneDepart();
   inline void setLeftLaneDepart(bool value);
 
-  inline  ::int8_t getLeadDistanceBars();
-  inline void setLeadDistanceBars( ::int8_t value);
-
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -2422,88 +2379,6 @@ public:
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
       : _typeless(kj::mv(typeless)) {}
 
-private:
-  ::capnp::AnyPointer::Pipeline _typeless;
-  friend class ::capnp::PipelineHook;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-};
-#endif  // !CAPNP_LITE
-
-class CarOutput::Reader {
-public:
-  typedef CarOutput Reads;
-
-  Reader() = default;
-  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
-
-  inline ::capnp::MessageSize totalSize() const {
-    return _reader.totalSize().asPublic();
-  }
-
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const {
-    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
-  }
-#endif  // !CAPNP_LITE
-
-  inline bool hasActuatorsOutput() const;
-  inline  ::cereal::CarControl::Actuators::Reader getActuatorsOutput() const;
-
-private:
-  ::capnp::_::StructReader _reader;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::List;
-  friend class ::capnp::MessageBuilder;
-  friend class ::capnp::Orphanage;
-};
-
-class CarOutput::Builder {
-public:
-  typedef CarOutput Builds;
-
-  Builder() = delete;  // Deleted to discourage incorrect usage.
-                       // You can explicitly initialize to nullptr instead.
-  inline Builder(decltype(nullptr)) {}
-  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
-  inline operator Reader() const { return Reader(_builder.asReader()); }
-  inline Reader asReader() const { return *this; }
-
-  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
-#if !CAPNP_LITE
-  inline ::kj::StringTree toString() const { return asReader().toString(); }
-#endif  // !CAPNP_LITE
-
-  inline bool hasActuatorsOutput();
-  inline  ::cereal::CarControl::Actuators::Builder getActuatorsOutput();
-  inline void setActuatorsOutput( ::cereal::CarControl::Actuators::Reader value);
-  inline  ::cereal::CarControl::Actuators::Builder initActuatorsOutput();
-  inline void adoptActuatorsOutput(::capnp::Orphan< ::cereal::CarControl::Actuators>&& value);
-  inline ::capnp::Orphan< ::cereal::CarControl::Actuators> disownActuatorsOutput();
-
-private:
-  ::capnp::_::StructBuilder _builder;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::ToDynamic_;
-  friend class ::capnp::Orphanage;
-  template <typename, ::capnp::Kind>
-  friend struct ::capnp::_::PointerHelpers;
-};
-
-#if !CAPNP_LITE
-class CarOutput::Pipeline {
-public:
-  typedef CarOutput Pipelines;
-
-  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
-  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
-      : _typeless(kj::mv(typeless)) {}
-
-  inline  ::cereal::CarControl::Actuators::Pipeline getActuatorsOutput();
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -2535,7 +2410,7 @@ public:
   inline bool hasCarFingerprint() const;
   inline  ::capnp::Text::Reader getCarFingerprint() const;
 
-  inline bool getEnableGasInterceptorDEPRECATED() const;
+  inline bool getEnableGasInterceptor() const;
 
   inline bool getPcmCruise() const;
 
@@ -2682,8 +2557,6 @@ public:
 
   inline float getTireStiffnessFactor() const;
 
-  inline bool getPassive() const;
-
   inline bool getPcmCruiseSpeed() const;
 
   inline bool getCustomStockLongAvailable() const;
@@ -2732,8 +2605,8 @@ public:
   inline void adoptCarFingerprint(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownCarFingerprint();
 
-  inline bool getEnableGasInterceptorDEPRECATED();
-  inline void setEnableGasInterceptorDEPRECATED(bool value);
+  inline bool getEnableGasInterceptor();
+  inline void setEnableGasInterceptor(bool value);
 
   inline bool getPcmCruise();
   inline void setPcmCruise(bool value);
@@ -2985,9 +2858,6 @@ public:
 
   inline float getTireStiffnessFactor();
   inline void setTireStiffnessFactor(float value);
-
-  inline bool getPassive();
-  inline void setPassive(bool value);
 
   inline bool getPcmCruiseSpeed();
   inline void setPcmCruiseSpeed(bool value);
@@ -5143,172 +5013,130 @@ inline void CarState::Builder::setCarFaultedNonCritical(bool value) {
       ::capnp::bounded<362>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::uint32_t CarState::Reader::getCanErrorCounter() const {
-  return _reader.getDataField< ::uint32_t>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
-}
-
-inline  ::uint32_t CarState::Builder::getCanErrorCounter() {
-  return _builder.getDataField< ::uint32_t>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
-}
-inline void CarState::Builder::setCanErrorCounter( ::uint32_t value) {
-  _builder.setDataField< ::uint32_t>(
-      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool CarState::Reader::getCanRcvTimeoutDEPRECATED() const {
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<363>() * ::capnp::ELEMENTS);
-}
-
-inline bool CarState::Builder::getCanRcvTimeoutDEPRECATED() {
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<363>() * ::capnp::ELEMENTS);
-}
-inline void CarState::Builder::setCanRcvTimeoutDEPRECATED(bool value) {
-  _builder.setDataField<bool>(
-      ::capnp::bounded<363>() * ::capnp::ELEMENTS, value);
-}
-
-inline float CarState::Reader::getCumLagMs() const {
-  return _reader.getDataField<float>(
-      ::capnp::bounded<17>() * ::capnp::ELEMENTS);
-}
-
-inline float CarState::Builder::getCumLagMs() {
-  return _builder.getDataField<float>(
-      ::capnp::bounded<17>() * ::capnp::ELEMENTS);
-}
-inline void CarState::Builder::setCumLagMs(float value) {
-  _builder.setDataField<float>(
-      ::capnp::bounded<17>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool CarState::Reader::getMadsEnabled() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<364>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<363>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getMadsEnabled() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<364>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<363>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setMadsEnabled(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<364>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<363>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getLeftBlinkerOn() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<365>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<364>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getLeftBlinkerOn() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<365>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<364>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setLeftBlinkerOn(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<365>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<364>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getRightBlinkerOn() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<366>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<365>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getRightBlinkerOn() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<366>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<365>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setRightBlinkerOn(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<366>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<365>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getDisengageByBrake() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<367>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<366>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getDisengageByBrake() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<367>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<366>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setDisengageByBrake(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<367>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<366>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getBelowLaneChangeSpeed() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<368>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<367>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getBelowLaneChangeSpeed() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<368>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<367>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setBelowLaneChangeSpeed(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<368>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<367>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getAccEnabled() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<369>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<368>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getAccEnabled() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<369>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<368>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setAccEnabled(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<369>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<368>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getLatActive() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<370>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<369>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getLatActive() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<370>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<369>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setLatActive(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<370>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<369>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::int32_t CarState::Reader::getGapAdjustCruiseTr() const {
   return _reader.getDataField< ::int32_t>(
-      ::capnp::bounded<18>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
 }
 
 inline  ::int32_t CarState::Builder::getGapAdjustCruiseTr() {
   return _builder.getDataField< ::int32_t>(
-      ::capnp::bounded<18>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setGapAdjustCruiseTr( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
-      ::capnp::bounded<18>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::getEndToEndLong() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<371>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<370>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarState::Builder::getEndToEndLong() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<371>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<370>() * ::capnp::ELEMENTS);
 }
 inline void CarState::Builder::setEndToEndLong(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<371>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<370>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarState::Reader::hasCustomStockLong() const {
@@ -6067,41 +5895,41 @@ inline void CarControl::Builder::setPitchDEPRECATED(float value) {
       ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool CarControl::Reader::hasActuatorsOutputDEPRECATED() const {
+inline bool CarControl::Reader::hasActuatorsOutput() const {
   return !_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline bool CarControl::Builder::hasActuatorsOutputDEPRECATED() {
+inline bool CarControl::Builder::hasActuatorsOutput() {
   return !_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline  ::cereal::CarControl::Actuators::Reader CarControl::Reader::getActuatorsOutputDEPRECATED() const {
+inline  ::cereal::CarControl::Actuators::Reader CarControl::Reader::getActuatorsOutput() const {
   return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::get(_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline  ::cereal::CarControl::Actuators::Builder CarControl::Builder::getActuatorsOutputDEPRECATED() {
+inline  ::cereal::CarControl::Actuators::Builder CarControl::Builder::getActuatorsOutput() {
   return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::get(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 #if !CAPNP_LITE
-inline  ::cereal::CarControl::Actuators::Pipeline CarControl::Pipeline::getActuatorsOutputDEPRECATED() {
+inline  ::cereal::CarControl::Actuators::Pipeline CarControl::Pipeline::getActuatorsOutput() {
   return  ::cereal::CarControl::Actuators::Pipeline(_typeless.getPointerField(3));
 }
 #endif  // !CAPNP_LITE
-inline void CarControl::Builder::setActuatorsOutputDEPRECATED( ::cereal::CarControl::Actuators::Reader value) {
+inline void CarControl::Builder::setActuatorsOutput( ::cereal::CarControl::Actuators::Reader value) {
   ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline  ::cereal::CarControl::Actuators::Builder CarControl::Builder::initActuatorsOutputDEPRECATED() {
+inline  ::cereal::CarControl::Actuators::Builder CarControl::Builder::initActuatorsOutput() {
   return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::init(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline void CarControl::Builder::adoptActuatorsOutputDEPRECATED(
+inline void CarControl::Builder::adoptActuatorsOutput(
     ::capnp::Orphan< ::cereal::CarControl::Actuators>&& value) {
   ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::adopt(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::cereal::CarControl::Actuators> CarControl::Builder::disownActuatorsOutputDEPRECATED() {
+inline ::capnp::Orphan< ::cereal::CarControl::Actuators> CarControl::Builder::disownActuatorsOutput() {
   return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::disown(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
@@ -6588,59 +6416,6 @@ inline void CarControl::HUDControl::Builder::setLeftLaneDepart(bool value) {
       ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int8_t CarControl::HUDControl::Reader::getLeadDistanceBars() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t CarControl::HUDControl::Builder::getLeadDistanceBars() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void CarControl::HUDControl::Builder::setLeadDistanceBars( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool CarOutput::Reader::hasActuatorsOutput() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline bool CarOutput::Builder::hasActuatorsOutput() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
-}
-inline  ::cereal::CarControl::Actuators::Reader CarOutput::Reader::getActuatorsOutput() const {
-  return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::get(_reader.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline  ::cereal::CarControl::Actuators::Builder CarOutput::Builder::getActuatorsOutput() {
-  return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::get(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-#if !CAPNP_LITE
-inline  ::cereal::CarControl::Actuators::Pipeline CarOutput::Pipeline::getActuatorsOutput() {
-  return  ::cereal::CarControl::Actuators::Pipeline(_typeless.getPointerField(0));
-}
-#endif  // !CAPNP_LITE
-inline void CarOutput::Builder::setActuatorsOutput( ::cereal::CarControl::Actuators::Reader value) {
-  ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::set(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
-}
-inline  ::cereal::CarControl::Actuators::Builder CarOutput::Builder::initActuatorsOutput() {
-  return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::init(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-inline void CarOutput::Builder::adoptActuatorsOutput(
-    ::capnp::Orphan< ::cereal::CarControl::Actuators>&& value) {
-  ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::adopt(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::cereal::CarControl::Actuators> CarOutput::Builder::disownActuatorsOutput() {
-  return ::capnp::_::PointerHelpers< ::cereal::CarControl::Actuators>::disown(_builder.getPointerField(
-      ::capnp::bounded<0>() * ::capnp::POINTERS));
-}
-
 inline bool CarParams::Reader::hasCarName() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -6709,16 +6484,16 @@ inline ::capnp::Orphan< ::capnp::Text> CarParams::Builder::disownCarFingerprint(
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline bool CarParams::Reader::getEnableGasInterceptorDEPRECATED() const {
+inline bool CarParams::Reader::getEnableGasInterceptor() const {
   return _reader.getDataField<bool>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline bool CarParams::Builder::getEnableGasInterceptorDEPRECATED() {
+inline bool CarParams::Builder::getEnableGasInterceptor() {
   return _builder.getDataField<bool>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void CarParams::Builder::setEnableGasInterceptorDEPRECATED(bool value) {
+inline void CarParams::Builder::setEnableGasInterceptor(bool value) {
   _builder.setDataField<bool>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
@@ -7917,46 +7692,32 @@ inline void CarParams::Builder::setTireStiffnessFactor(float value) {
       ::capnp::bounded<33>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool CarParams::Reader::getPassive() const {
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<996>() * ::capnp::ELEMENTS);
-}
-
-inline bool CarParams::Builder::getPassive() {
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<996>() * ::capnp::ELEMENTS);
-}
-inline void CarParams::Builder::setPassive(bool value) {
-  _builder.setDataField<bool>(
-      ::capnp::bounded<996>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool CarParams::Reader::getPcmCruiseSpeed() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<997>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<996>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarParams::Builder::getPcmCruiseSpeed() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<997>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<996>() * ::capnp::ELEMENTS);
 }
 inline void CarParams::Builder::setPcmCruiseSpeed(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<997>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<996>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool CarParams::Reader::getCustomStockLongAvailable() const {
   return _reader.getDataField<bool>(
-      ::capnp::bounded<998>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<997>() * ::capnp::ELEMENTS);
 }
 
 inline bool CarParams::Builder::getCustomStockLongAvailable() {
   return _builder.getDataField<bool>(
-      ::capnp::bounded<998>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<997>() * ::capnp::ELEMENTS);
 }
 inline void CarParams::Builder::setCustomStockLongAvailable(bool value) {
   _builder.setDataField<bool>(
-      ::capnp::bounded<998>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<997>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::uint32_t CarParams::Reader::getSpFlags() const {
@@ -9695,6 +9456,4 @@ inline ::capnp::Orphan< ::cereal::CarParams::LateralTorqueTuning> CarParams::Lat
 }
 
 }  // namespace
-
-CAPNP_END_HEADER
 

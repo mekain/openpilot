@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import bz2
 import math
 import json
@@ -9,6 +10,7 @@ import shutil
 import subprocess
 import time
 import numpy as np
+import unittest
 from collections import Counter, defaultdict
 from functools import cached_property
 from pathlib import Path
@@ -25,55 +27,49 @@ from openpilot.selfdrive.test.helpers import set_params_enabled, release_only
 from openpilot.system.hardware.hw import Paths
 from openpilot.tools.lib.logreader import LogReader
 
-"""
-CPU usage budget
-* each process is entitled to at least 8%
-* total CPU usage of openpilot (sum(PROCS.values())
-  should not exceed MAX_TOTAL_CPU
-"""
-MAX_TOTAL_CPU = 250.  # total for all 8 cores
+# Baseline CPU usage by process
 PROCS = {
-  # Baseline CPU usage by process
-  "selfdrive.controls.controlsd": 32.0,
-  "selfdrive.car.card": 22.0,
+  "selfdrive.controls.controlsd": 39.0,
   "./loggerd": 14.0,
   "./encoderd": 17.0,
   "./camerad": 14.5,
   "./locationd": 11.0,
-  "selfdrive.controls.plannerd": 11.0,
-  "./ui": 18.0,
+  "./mapsd": 1.5,
+  "selfdrive.controls.plannerd": 16.5,
+  "./_ui": 18.0,
   "selfdrive.locationd.paramsd": 9.0,
   "./sensord": 7.0,
-  "selfdrive.controls.radard": 7.0,
+  "selfdrive.controls.radard": 4.5,
   "selfdrive.modeld.modeld": 13.0,
   "selfdrive.modeld.dmonitoringmodeld": 8.0,
-  "system.hardware.hardwared": 3.87,
+  "selfdrive.modeld.navmodeld": 1.0,
+  "selfdrive.thermald.thermald": 3.87,
   "selfdrive.locationd.calibrationd": 2.0,
   "selfdrive.locationd.torqued": 5.0,
-  "selfdrive.ui.soundd": 3.5,
+  "./_soundd": (1.0, 65.0),
   "selfdrive.monitoring.dmonitoringd": 4.0,
   "./proclogd": 1.54,
   "system.logmessaged": 0.2,
-  "system.tombstoned": 0,
+  "selfdrive.tombstoned": 0,
   "./logcatd": 0,
-  "system.micd": 6.0,
-  "system.timed": 0,
-  "selfdrive.pandad.pandad": 0,
-  "system.statsd": 0.4,
+  "system.micd": 10.0,
+  "system.timezoned": 0,
+  "selfdrive.boardd.pandad": 0,
+  "selfdrive.statsd": 0.4,
   "selfdrive.navd.navd": 0.4,
-  "system.loggerd.uploader": (0.5, 15.0),
+  "system.loggerd.uploader": 3.0,
   "system.loggerd.deleter": 0.1,
 }
 
 PROCS.update({
   "tici": {
-    "./pandad": 4.0,
+    "./boardd": 4.0,
     "./ubloxd": 0.02,
-    "system.ubloxd.pigeond": 6.0,
+    "system.sensord.pigeond": 6.0,
   },
   "tizi": {
-     "./pandad": 19.0,
-    "system.qcomgpsd.qcomgpsd": 1.0,
+     "./boardd": 19.0,
+    "system.sensord.rawgps.rawgpsd": 1.0,
   }
 }.get(HARDWARE.get_device_type(), {}))
 
@@ -86,11 +82,14 @@ TIMINGS = {
   "carState": [2.5, 0.35],
   "carControl": [2.5, 0.35],
   "controlsState": [2.5, 0.35],
+  "lateralPlan": [2.5, 0.5],
   "longitudinalPlan": [2.5, 0.5],
   "roadCameraState": [2.5, 0.35],
   "driverCameraState": [2.5, 0.35],
   "modelV2": [2.5, 0.35],
   "driverStateV2": [2.5, 0.40],
+  "navModel": [2.5, 0.35],
+  "mapRenderState": [2.5, 0.35],
   "liveLocationKalman": [2.5, 0.35],
   "wideRoadCameraState": [1.5, 0.35],
 }
@@ -101,10 +100,10 @@ def cputime_total(ct):
 
 
 @pytest.mark.tici
-class TestOnroad:
+class TestOnroad(unittest.TestCase):
 
   @classmethod
-  def setup_class(cls):
+  def setUpClass(cls):
     if "DEBUG" in os.environ:
       segs = filter(lambda x: os.path.exists(os.path.join(x, "rlog")), Path(Paths.log_root()).iterdir())
       segs = sorted(segs, key=lambda x: x.stat().st_mtime)
@@ -114,22 +113,27 @@ class TestOnroad:
 
     # setup env
     params = Params()
+    if "CI" in os.environ:
+      params.clear_all()
     params.remove("CurrentRoute")
     set_params_enabled()
-    os.environ['REPLAY'] = '1'
     os.environ['TESTING_CLOSET'] = '1'
     if os.path.exists(Paths.log_root()):
       shutil.rmtree(Paths.log_root())
+    os.system("rm /dev/shm/*")
+
+    # Make sure athena isn't running
+    os.system("pkill -9 -f athena")
 
     # start manager and run openpilot for a minute
     proc = None
     try:
-      manager_path = os.path.join(BASEDIR, "system/manager/manager.py")
+      manager_path = os.path.join(BASEDIR, "selfdrive/manager/manager.py")
       proc = subprocess.Popen(["python", manager_path])
 
       sm = messaging.SubMaster(['carState'])
       with Timeout(150, "controls didn't start"):
-        while sm.recv_frame['carState'] < 0:
+        while sm.rcv_frame['carState'] < 0:
           sm.update(1000)
 
       # make sure we get at least two full segments
@@ -164,15 +168,6 @@ class TestOnroad:
     cls.lr = list(LogReader(os.path.join(str(cls.segments[1]), "rlog")))
     cls.log_path = cls.segments[1]
 
-    cls.log_sizes = {}
-    for f in cls.log_path.iterdir():
-      assert f.is_file()
-      cls.log_sizes[f]  = f.stat().st_size / 1e6
-      if f.name in ("qlog", "rlog"):
-        with open(f, 'rb') as ff:
-          cls.log_sizes[f] = len(bz2.compress(ff.read())) / 1e6
-
-
   @cached_property
   def service_msgs(self):
     msgs = defaultdict(list)
@@ -180,7 +175,7 @@ class TestOnroad:
       msgs[m.which()].append(m)
     return msgs
 
-  def test_service_frequencies(self, subtests):
+  def test_service_frequencies(self):
     for s, msgs in self.service_msgs.items():
       if s in ('initData', 'sentinel'):
         continue
@@ -189,21 +184,28 @@ class TestOnroad:
       if s in ('ubloxGnss', 'ubloxRaw', 'gnssMeasurements', 'gpsLocation', 'gpsLocationExternal', 'qcomGnss'):
         continue
 
-      with subtests.test(service=s):
+      with self.subTest(service=s):
         assert len(msgs) >= math.floor(SERVICE_LIST[s].frequency*55)
 
   def test_cloudlog_size(self):
     msgs = [m for m in self.lr if m.which() == 'logMessage']
 
     total_size = sum(len(m.as_builder().to_bytes()) for m in msgs)
-    assert total_size < 3.5e5
+    self.assertLess(total_size, 3.5e5)
 
     cnt = Counter(json.loads(m.logMessage)['filename'] for m in msgs)
     big_logs = [f for f, n in cnt.most_common(3) if n / sum(cnt.values()) > 30.]
-    assert len(big_logs) == 0, f"Log spam: {big_logs}"
+    self.assertEqual(len(big_logs), 0, f"Log spam: {big_logs}")
 
   def test_log_sizes(self):
-    for f, sz in self.log_sizes.items():
+    for f in self.log_path.iterdir():
+      assert f.is_file()
+
+      sz = f.stat().st_size / 1e6
+      if f.name in ("qlog", "rlog"):
+        with open(f, 'rb') as ff:
+          sz = len(bz2.compress(ff.read())) / 1e6
+
       if f.name == "qcamera.ts":
         assert 2.15 < sz < 2.35
       elif f.name == "qlog":
@@ -229,15 +231,15 @@ class TestOnroad:
     result += "------------------------------------------------\n"
     print(result)
 
-    assert max(ts) < 250.
-    assert np.mean(ts) < 10.
+    self.assertLess(max(ts), 250.)
+    self.assertLess(np.mean(ts), 10.)
     #self.assertLess(np.std(ts), 5.)
 
     # some slow frames are expected since camerad/modeld can preempt ui
     veryslow = [x for x in ts if x > 40.]
     assert len(veryslow) < 5, f"Too many slow frame draw times: {veryslow}"
 
-  def test_cpu_usage(self, subtests):
+  def test_cpu_usage(self):
     result = "\n"
     result += "------------------------------------------------\n"
     result += "------------------ CPU Usage -------------------\n"
@@ -280,25 +282,17 @@ class TestOnroad:
       result += f"{proc_name.ljust(35)}  {cpu_usage:5.2f}% ({exp}%) {err}\n"
       if len(err) > 0:
         cpu_ok = False
-    result += "------------------------------------------------\n"
 
     # Ensure there's no missing procs
     all_procs = {p.name for p in self.service_msgs['managerState'][0].managerState.processes if p.shouldBeRunning}
     for p in all_procs:
-      with subtests.test(proc=p):
+      with self.subTest(proc=p):
         assert any(p in pp for pp in PROCS.keys()), f"Expected CPU usage missing for {p}"
 
-    # total CPU check
-    procs_tot = sum([(max(x) if isinstance(x, tuple) else x) for x in PROCS.values()])
-    with subtests.test(name="total CPU"):
-      assert procs_tot < MAX_TOTAL_CPU, "Total CPU budget exceeded"
-    result +=  "------------------------------------------------\n"
-    result += f"Total allocated CPU usage is {procs_tot}%, budget is {MAX_TOTAL_CPU}%, {MAX_TOTAL_CPU-procs_tot:.1f}% left\n"
-    result +=  "------------------------------------------------\n"
-
+    result += "------------------------------------------------\n"
     print(result)
 
-    assert cpu_ok
+    self.assertTrue(cpu_ok)
 
   def test_memory_usage(self):
     mems = [m.deviceState.memoryUsagePercent for m in self.service_msgs['deviceState']]
@@ -306,26 +300,26 @@ class TestOnroad:
 
     # check for big leaks. note that memory usage is
     # expected to go up while the MSGQ buffers fill up
-    assert max(mems) - min(mems) <= 3.0
+    self.assertLessEqual(max(mems) - min(mems), 3.0)
 
   def test_gpu_usage(self):
-    assert self.gpu_procs == {"weston", "ui", "camerad", "selfdrive.modeld.modeld"}
+    self.assertEqual(self.gpu_procs, {"weston", "_ui", "camerad", "selfdrive.modeld.modeld"})
 
   def test_camera_processing_time(self):
     result = "\n"
     result += "------------------------------------------------\n"
-    result += "-------------- ImgProc Timing ------------------\n"
+    result += "-------------- Debayer Timing ------------------\n"
     result += "------------------------------------------------\n"
 
     ts = [getattr(m, m.which()).processingTime for m in self.lr if 'CameraState' in m.which()]
-    assert min(ts) < 0.025, f"high execution time: {min(ts)}"
+    self.assertLess(min(ts), 0.025, f"high execution time: {min(ts)}")
     result += f"execution time: min  {min(ts):.5f}s\n"
     result += f"execution time: max  {max(ts):.5f}s\n"
     result += f"execution time: mean {np.mean(ts):.5f}s\n"
     result += "------------------------------------------------\n"
     print(result)
 
-  @pytest.mark.skip("TODO: enable once timings are fixed")
+  @unittest.skip("TODO: enable once timings are fixed")
   def test_camera_frame_timings(self):
     result = "\n"
     result += "------------------------------------------------\n"
@@ -335,7 +329,7 @@ class TestOnroad:
       ts = [getattr(m, m.which()).timestampSof for m in self.lr if name in m.which()]
       d_ms = np.diff(ts) / 1e6
       d50 = np.abs(d_ms-50)
-      assert max(d50) < 1.0, f"high sof delta vs 50ms: {max(d50)}"
+      self.assertLess(max(d50), 1.0, f"high sof delta vs 50ms: {max(d50)}")
       result += f"{name} sof delta vs 50ms: min  {min(d50):.5f}s\n"
       result += f"{name} sof delta vs 50ms: max  {max(d50):.5f}s\n"
       result += f"{name} sof delta vs 50ms: mean {d50.mean():.5f}s\n"
@@ -348,11 +342,11 @@ class TestOnroad:
     result += "-----------------  MPC Timing ------------------\n"
     result += "------------------------------------------------\n"
 
-    cfgs = [("longitudinalPlan", 0.05, 0.05),]
+    cfgs = [("lateralPlan", 0.05, 0.05), ("longitudinalPlan", 0.05, 0.05)]
     for (s, instant_max, avg_max) in cfgs:
       ts = [getattr(m, s).solverExecutionTime for m in self.service_msgs[s]]
-      assert max(ts) < instant_max, f"high '{s}' execution time: {max(ts)}"
-      assert np.mean(ts) < avg_max, f"high avg '{s}' execution time: {np.mean(ts)}"
+      self.assertLess(max(ts), instant_max, f"high '{s}' execution time: {max(ts)}")
+      self.assertLess(np.mean(ts), avg_max, f"high avg '{s}' execution time: {np.mean(ts)}")
       result += f"'{s}' execution time: min  {min(ts):.5f}s\n"
       result += f"'{s}' execution time: max  {max(ts):.5f}s\n"
       result += f"'{s}' execution time: mean {np.mean(ts):.5f}s\n"
@@ -371,8 +365,8 @@ class TestOnroad:
     ]
     for (s, instant_max, avg_max) in cfgs:
       ts = [getattr(m, s).modelExecutionTime for m in self.service_msgs[s]]
-      assert max(ts) < instant_max, f"high '{s}' execution time: {max(ts)}"
-      assert np.mean(ts) < avg_max, f"high avg '{s}' execution time: {np.mean(ts)}"
+      self.assertLess(max(ts), instant_max, f"high '{s}' execution time: {max(ts)}")
+      self.assertLess(np.mean(ts), avg_max, f"high avg '{s}' execution time: {np.mean(ts)}")
       result += f"'{s}' execution time: min  {min(ts):.5f}s\n"
       result += f"'{s}' execution time: max {max(ts):.5f}s\n"
       result += f"'{s}' execution time: mean {np.mean(ts):.5f}s\n"
@@ -408,26 +402,30 @@ class TestOnroad:
       result += f"{''.ljust(40)}  {np.max(np.absolute([np.max(ts)/dt, np.min(ts)/dt]))} {np.std(ts)/dt}\n"
     result += "="*67
     print(result)
-    assert passed
+    self.assertTrue(passed)
 
   @release_only
   def test_startup(self):
     startup_alert = None
     for msg in self.lrs[0]:
-      # can't use onroadEvents because the first msg can be dropped while loggerd is starting up
+      # can't use carEvents because the first msg can be dropped while loggerd is starting up
       if msg.which() == "controlsState":
         startup_alert = msg.controlsState.alertText1
         break
     expected = EVENTS[car.CarEvent.EventName.startup][ET.PERMANENT].alert_text_1
-    assert startup_alert == expected, "wrong startup alert"
+    self.assertEqual(startup_alert, expected, "wrong startup alert")
 
   def test_engagable(self):
     no_entries = Counter()
-    for m in self.service_msgs['onroadEvents']:
-      for evt in m.onroadEvents:
+    for m in self.service_msgs['carEvents']:
+      for evt in m.carEvents:
         if evt.noEntry:
           no_entries[evt.name] += 1
 
     eng = [m.controlsState.engageable for m in self.service_msgs['controlsState']]
     assert all(eng), \
            f"Not engageable for whole segment:\n- controlsState.engageable: {Counter(eng)}\n- No entry events: {no_entries}"
+
+
+if __name__ == "__main__":
+  unittest.main()

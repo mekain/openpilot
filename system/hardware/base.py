@@ -1,15 +1,16 @@
 from abc import abstractmethod, ABC
 from collections import namedtuple
+from typing import Dict
 
 from cereal import log
 
-ThermalConfig = namedtuple('ThermalConfig', ['cpu', 'gpu', 'mem', 'bat', 'pmic'])
+ThermalConfig = namedtuple('ThermalConfig', ['cpu', 'gpu', 'mem', 'bat', 'ambient', 'pmic'])
 NetworkType = log.DeviceState.NetworkType
 
 
 class HardwareBase(ABC):
   @staticmethod
-  def get_cmdline() -> dict[str, str]:
+  def get_cmdline() -> Dict[str, str]:
     with open('/proc/cmdline') as f:
       cmdline = f.read()
     return {kv[0]: kv[1] for kv in [s.split('=') for s in cmdline.split(' ')] if len(kv) == 2}
@@ -21,9 +22,6 @@ class HardwareBase(ABC):
         return parser(f.read())
     except Exception:
       return default
-
-  def booted(self) -> bool:
-    return True
 
   @abstractmethod
   def reboot(self, reason=None):
@@ -51,6 +49,10 @@ class HardwareBase(ABC):
 
   @abstractmethod
   def get_serial(self):
+    pass
+
+  @abstractmethod
+  def get_subscriber_info(self):
     pass
 
   @abstractmethod

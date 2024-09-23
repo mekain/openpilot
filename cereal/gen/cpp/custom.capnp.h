@@ -6,15 +6,11 @@
 #include <capnp/generated-header-support.h>
 #include <kj/windows-sanity.h>
 
-#ifndef CAPNP_VERSION
-#error "CAPNP_VERSION is not defined, is capnp/generated-header-support.h missing?"
-#elif CAPNP_VERSION != 1000002
+#if CAPNP_VERSION != 8000
 #error "Version mismatch between generated code and library headers.  You must use the same version of the Cap'n Proto compiler and library."
 #endif
 
 #include "car.capnp.h"
-
-CAPNP_BEGIN_HEADER
 
 namespace capnp {
 namespace schemas {
@@ -336,15 +332,15 @@ struct E2eLongStateSP {
   };
 };
 
-struct ModelDataV2SP {
-  ModelDataV2SP() = delete;
+struct CustomReserved6 {
+  CustomReserved6() = delete;
 
   class Reader;
   class Builder;
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f98d843bfd7004a3, 1, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(f98d843bfd7004a3, 0, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -420,8 +416,6 @@ public:
 
   inline typename LateralControlState::Reader getLateralControlState() const;
 
-  inline  ::cereal::LongitudinalPersonalitySP getPersonality() const;
-
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -459,9 +453,6 @@ public:
 
   inline typename LateralControlState::Builder getLateralControlState();
   inline typename LateralControlState::Builder initLateralControlState();
-
-  inline  ::cereal::LongitudinalPersonalitySP getPersonality();
-  inline void setPersonality( ::cereal::LongitudinalPersonalitySP value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1217,9 +1208,7 @@ public:
 
   inline  ::cereal::LongitudinalPlanSP::LongitudinalPlanSource getLongitudinalPlanSource() const;
 
-  inline  ::cereal::LongitudinalPersonalitySP getPersonalityDEPRECATED() const;
-
-  inline bool getE2eStatus() const;
+  inline  ::cereal::LongitudinalPersonalitySP getPersonality() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1325,11 +1314,8 @@ public:
   inline  ::cereal::LongitudinalPlanSP::LongitudinalPlanSource getLongitudinalPlanSource();
   inline void setLongitudinalPlanSource( ::cereal::LongitudinalPlanSP::LongitudinalPlanSource value);
 
-  inline  ::cereal::LongitudinalPersonalitySP getPersonalityDEPRECATED();
-  inline void setPersonalityDEPRECATED( ::cereal::LongitudinalPersonalitySP value);
-
-  inline bool getE2eStatus();
-  inline void setE2eStatus(bool value);
+  inline  ::cereal::LongitudinalPersonalitySP getPersonality();
+  inline void setPersonality( ::cereal::LongitudinalPersonalitySP value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1386,17 +1372,17 @@ public:
 
   inline float getStandstillElapsed() const;
 
-  inline bool hasDPathWLinesXDEPRECATED() const;
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader getDPathWLinesXDEPRECATED() const;
+  inline bool hasDPathWLinesX() const;
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader getDPathWLinesX() const;
 
-  inline bool hasDPathWLinesYDEPRECATED() const;
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader getDPathWLinesYDEPRECATED() const;
+  inline bool hasDPathWLinesY() const;
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader getDPathWLinesY() const;
 
-  inline bool getLaneChangePrevDEPRECATED() const;
+  inline bool getLaneChangePrev() const;
 
   inline bool getDynamicLaneProfileStatus() const;
 
-  inline bool getLaneChangeEdgeBlockDEPRECATED() const;
+  inline bool getLaneChangeEdgeBlock() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -1444,30 +1430,30 @@ public:
   inline float getStandstillElapsed();
   inline void setStandstillElapsed(float value);
 
-  inline bool hasDPathWLinesXDEPRECATED();
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder getDPathWLinesXDEPRECATED();
-  inline void setDPathWLinesXDEPRECATED( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value);
-  inline void setDPathWLinesXDEPRECATED(::kj::ArrayPtr<const float> value);
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder initDPathWLinesXDEPRECATED(unsigned int size);
-  inline void adoptDPathWLinesXDEPRECATED(::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value);
-  inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> disownDPathWLinesXDEPRECATED();
+  inline bool hasDPathWLinesX();
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder getDPathWLinesX();
+  inline void setDPathWLinesX( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setDPathWLinesX(::kj::ArrayPtr<const float> value);
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder initDPathWLinesX(unsigned int size);
+  inline void adoptDPathWLinesX(::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> disownDPathWLinesX();
 
-  inline bool hasDPathWLinesYDEPRECATED();
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder getDPathWLinesYDEPRECATED();
-  inline void setDPathWLinesYDEPRECATED( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value);
-  inline void setDPathWLinesYDEPRECATED(::kj::ArrayPtr<const float> value);
-  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder initDPathWLinesYDEPRECATED(unsigned int size);
-  inline void adoptDPathWLinesYDEPRECATED(::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value);
-  inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> disownDPathWLinesYDEPRECATED();
+  inline bool hasDPathWLinesY();
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder getDPathWLinesY();
+  inline void setDPathWLinesY( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setDPathWLinesY(::kj::ArrayPtr<const float> value);
+  inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder initDPathWLinesY(unsigned int size);
+  inline void adoptDPathWLinesY(::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> disownDPathWLinesY();
 
-  inline bool getLaneChangePrevDEPRECATED();
-  inline void setLaneChangePrevDEPRECATED(bool value);
+  inline bool getLaneChangePrev();
+  inline void setLaneChangePrev(bool value);
 
   inline bool getDynamicLaneProfileStatus();
   inline void setDynamicLaneProfileStatus(bool value);
 
-  inline bool getLaneChangeEdgeBlockDEPRECATED();
-  inline void setLaneChangeEdgeBlockDEPRECATED(bool value);
+  inline bool getLaneChangeEdgeBlock();
+  inline void setLaneChangeEdgeBlock(bool value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1851,9 +1837,9 @@ private:
 };
 #endif  // !CAPNP_LITE
 
-class ModelDataV2SP::Reader {
+class CustomReserved6::Reader {
 public:
-  typedef ModelDataV2SP Reads;
+  typedef CustomReserved6 Reads;
 
   Reader() = default;
   inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
@@ -1868,10 +1854,6 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline bool getLaneChangePrev() const;
-
-  inline bool getLaneChangeEdgeBlock() const;
-
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -1884,9 +1866,9 @@ private:
   friend class ::capnp::Orphanage;
 };
 
-class ModelDataV2SP::Builder {
+class CustomReserved6::Builder {
 public:
-  typedef ModelDataV2SP Builds;
+  typedef CustomReserved6 Builds;
 
   Builder() = delete;  // Deleted to discourage incorrect usage.
                        // You can explicitly initialize to nullptr instead.
@@ -1900,12 +1882,6 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline bool getLaneChangePrev();
-  inline void setLaneChangePrev(bool value);
-
-  inline bool getLaneChangeEdgeBlock();
-  inline void setLaneChangeEdgeBlock(bool value);
-
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -1916,9 +1892,9 @@ private:
 };
 
 #if !CAPNP_LITE
-class ModelDataV2SP::Pipeline {
+class CustomReserved6::Pipeline {
 public:
-  typedef ModelDataV2SP Pipelines;
+  typedef CustomReserved6 Pipelines;
 
   inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
   inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
@@ -2197,20 +2173,6 @@ inline typename ControlsStateSP::LateralControlState::Builder ControlsStateSP::B
   _builder.getPointerField(::capnp::bounded<1>() * ::capnp::POINTERS).clear();
   return typename ControlsStateSP::LateralControlState::Builder(_builder);
 }
-inline  ::cereal::LongitudinalPersonalitySP ControlsStateSP::Reader::getPersonality() const {
-  return _reader.getDataField< ::cereal::LongitudinalPersonalitySP>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline  ::cereal::LongitudinalPersonalitySP ControlsStateSP::Builder::getPersonality() {
-  return _builder.getDataField< ::cereal::LongitudinalPersonalitySP>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void ControlsStateSP::Builder::setPersonality( ::cereal::LongitudinalPersonalitySP value) {
-  _builder.setDataField< ::cereal::LongitudinalPersonalitySP>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool ControlsStateSP::LateralTorqueState::Reader::hasNnLog() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -2994,32 +2956,18 @@ inline void LongitudinalPlanSP::Builder::setLongitudinalPlanSource( ::cereal::Lo
       ::capnp::bounded<26>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::cereal::LongitudinalPersonalitySP LongitudinalPlanSP::Reader::getPersonalityDEPRECATED() const {
+inline  ::cereal::LongitudinalPersonalitySP LongitudinalPlanSP::Reader::getPersonality() const {
   return _reader.getDataField< ::cereal::LongitudinalPersonalitySP>(
       ::capnp::bounded<27>() * ::capnp::ELEMENTS);
 }
 
-inline  ::cereal::LongitudinalPersonalitySP LongitudinalPlanSP::Builder::getPersonalityDEPRECATED() {
+inline  ::cereal::LongitudinalPersonalitySP LongitudinalPlanSP::Builder::getPersonality() {
   return _builder.getDataField< ::cereal::LongitudinalPersonalitySP>(
       ::capnp::bounded<27>() * ::capnp::ELEMENTS);
 }
-inline void LongitudinalPlanSP::Builder::setPersonalityDEPRECATED( ::cereal::LongitudinalPersonalitySP value) {
+inline void LongitudinalPlanSP::Builder::setPersonality( ::cereal::LongitudinalPersonalitySP value) {
   _builder.setDataField< ::cereal::LongitudinalPersonalitySP>(
       ::capnp::bounded<27>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool LongitudinalPlanSP::Reader::getE2eStatus() const {
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<162>() * ::capnp::ELEMENTS);
-}
-
-inline bool LongitudinalPlanSP::Builder::getE2eStatus() {
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<162>() * ::capnp::ELEMENTS);
-}
-inline void LongitudinalPlanSP::Builder::setE2eStatus(bool value) {
-  _builder.setDataField<bool>(
-      ::capnp::bounded<162>() * ::capnp::ELEMENTS, value);
 }
 
 inline float LateralPlanSP::Reader::getLaneWidth() const {
@@ -3106,92 +3054,92 @@ inline void LateralPlanSP::Builder::setStandstillElapsed(float value) {
       ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool LateralPlanSP::Reader::hasDPathWLinesXDEPRECATED() const {
+inline bool LateralPlanSP::Reader::hasDPathWLinesX() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool LateralPlanSP::Builder::hasDPathWLinesXDEPRECATED() {
+inline bool LateralPlanSP::Builder::hasDPathWLinesX() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader LateralPlanSP::Reader::getDPathWLinesXDEPRECATED() const {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader LateralPlanSP::Reader::getDPathWLinesX() const {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::getDPathWLinesXDEPRECATED() {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::getDPathWLinesX() {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void LateralPlanSP::Builder::setDPathWLinesXDEPRECATED( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+inline void LateralPlanSP::Builder::setDPathWLinesX( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline void LateralPlanSP::Builder::setDPathWLinesXDEPRECATED(::kj::ArrayPtr<const float> value) {
+inline void LateralPlanSP::Builder::setDPathWLinesX(::kj::ArrayPtr<const float> value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::initDPathWLinesXDEPRECATED(unsigned int size) {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::initDPathWLinesX(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), size);
 }
-inline void LateralPlanSP::Builder::adoptDPathWLinesXDEPRECATED(
+inline void LateralPlanSP::Builder::adoptDPathWLinesX(
     ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> LateralPlanSP::Builder::disownDPathWLinesXDEPRECATED() {
+inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> LateralPlanSP::Builder::disownDPathWLinesX() {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool LateralPlanSP::Reader::hasDPathWLinesYDEPRECATED() const {
+inline bool LateralPlanSP::Reader::hasDPathWLinesY() const {
   return !_reader.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
-inline bool LateralPlanSP::Builder::hasDPathWLinesYDEPRECATED() {
+inline bool LateralPlanSP::Builder::hasDPathWLinesY() {
   return !_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader LateralPlanSP::Reader::getDPathWLinesYDEPRECATED() const {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader LateralPlanSP::Reader::getDPathWLinesY() const {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::getDPathWLinesYDEPRECATED() {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::getDPathWLinesY() {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
-inline void LateralPlanSP::Builder::setDPathWLinesYDEPRECATED( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+inline void LateralPlanSP::Builder::setDPathWLinesY( ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS), value);
 }
-inline void LateralPlanSP::Builder::setDPathWLinesYDEPRECATED(::kj::ArrayPtr<const float> value) {
+inline void LateralPlanSP::Builder::setDPathWLinesY(::kj::ArrayPtr<const float> value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::initDPathWLinesYDEPRECATED(unsigned int size) {
+inline  ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>::Builder LateralPlanSP::Builder::initDPathWLinesY(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS), size);
 }
-inline void LateralPlanSP::Builder::adoptDPathWLinesYDEPRECATED(
+inline void LateralPlanSP::Builder::adoptDPathWLinesY(
     ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> LateralPlanSP::Builder::disownDPathWLinesYDEPRECATED() {
+inline ::capnp::Orphan< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>> LateralPlanSP::Builder::disownDPathWLinesY() {
   return ::capnp::_::PointerHelpers< ::capnp::List<float,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline bool LateralPlanSP::Reader::getLaneChangePrevDEPRECATED() const {
+inline bool LateralPlanSP::Reader::getLaneChangePrev() const {
   return _reader.getDataField<bool>(
       ::capnp::bounded<136>() * ::capnp::ELEMENTS);
 }
 
-inline bool LateralPlanSP::Builder::getLaneChangePrevDEPRECATED() {
+inline bool LateralPlanSP::Builder::getLaneChangePrev() {
   return _builder.getDataField<bool>(
       ::capnp::bounded<136>() * ::capnp::ELEMENTS);
 }
-inline void LateralPlanSP::Builder::setLaneChangePrevDEPRECATED(bool value) {
+inline void LateralPlanSP::Builder::setLaneChangePrev(bool value) {
   _builder.setDataField<bool>(
       ::capnp::bounded<136>() * ::capnp::ELEMENTS, value);
 }
@@ -3210,16 +3158,16 @@ inline void LateralPlanSP::Builder::setDynamicLaneProfileStatus(bool value) {
       ::capnp::bounded<137>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool LateralPlanSP::Reader::getLaneChangeEdgeBlockDEPRECATED() const {
+inline bool LateralPlanSP::Reader::getLaneChangeEdgeBlock() const {
   return _reader.getDataField<bool>(
       ::capnp::bounded<138>() * ::capnp::ELEMENTS);
 }
 
-inline bool LateralPlanSP::Builder::getLaneChangeEdgeBlockDEPRECATED() {
+inline bool LateralPlanSP::Builder::getLaneChangeEdgeBlock() {
   return _builder.getDataField<bool>(
       ::capnp::bounded<138>() * ::capnp::ELEMENTS);
 }
-inline void LateralPlanSP::Builder::setLaneChangeEdgeBlockDEPRECATED(bool value) {
+inline void LateralPlanSP::Builder::setLaneChangeEdgeBlock(bool value) {
   _builder.setDataField<bool>(
       ::capnp::bounded<138>() * ::capnp::ELEMENTS, value);
 }
@@ -3652,35 +3600,5 @@ inline void E2eLongStateSP::Builder::setStatus( ::uint16_t value) {
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool ModelDataV2SP::Reader::getLaneChangePrev() const {
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline bool ModelDataV2SP::Builder::getLaneChangePrev() {
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void ModelDataV2SP::Builder::setLaneChangePrev(bool value) {
-  _builder.setDataField<bool>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool ModelDataV2SP::Reader::getLaneChangeEdgeBlock() const {
-  return _reader.getDataField<bool>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-
-inline bool ModelDataV2SP::Builder::getLaneChangeEdgeBlock() {
-  return _builder.getDataField<bool>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
-}
-inline void ModelDataV2SP::Builder::setLaneChangeEdgeBlock(bool value) {
-  _builder.setDataField<bool>(
-      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
-}
-
 }  // namespace
-
-CAPNP_END_HEADER
 

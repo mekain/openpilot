@@ -1,9 +1,11 @@
+import datetime
 import functools
 import re
+from typing import List, Optional
 
 from openpilot.tools.lib.auth_config import get_token
 from openpilot.tools.lib.api import CommaApi
-from openpilot.tools.lib.helpers import RE
+from openpilot.tools.lib.helpers import RE, timestamp_to_datetime
 
 
 @functools.total_ordering
@@ -15,8 +17,8 @@ class Bootlog:
     if not r:
       raise Exception(f"Unable to parse: {url}")
 
-    self._id = r.group('log_id')
     self._dongle_id = r.group('dongle_id')
+    self._timestamp = r.group('timestamp')
 
   @property
   def url(self) -> str:
@@ -27,23 +29,27 @@ class Bootlog:
     return self._dongle_id
 
   @property
-  def id(self) -> str:
-    return self._id
+  def timestamp(self) -> str:
+    return self._timestamp
+
+  @property
+  def datetime(self) -> datetime.datetime:
+    return timestamp_to_datetime(self._timestamp)
 
   def __str__(self):
-    return f"{self._dongle_id}/{self._id}"
+    return f"{self._dongle_id}|{self._timestamp}"
 
   def __eq__(self, b) -> bool:
     if not isinstance(b, Bootlog):
       return False
-    return self.id == b.id
+    return self.datetime == b.datetime
 
   def __lt__(self, b) -> bool:
     if not isinstance(b, Bootlog):
       return False
-    return self.id < b.id
+    return self.datetime < b.datetime
 
-def get_bootlog_from_id(bootlog_id: str) -> Bootlog | None:
+def get_bootlog_from_id(bootlog_id: str) -> Optional[Bootlog]:
   # TODO: implement an API endpoint for this
   bl = Bootlog(bootlog_id)
   for b in get_bootlogs(bl.dongle_id):
@@ -51,7 +57,7 @@ def get_bootlog_from_id(bootlog_id: str) -> Bootlog | None:
       return b
   return None
 
-def get_bootlogs(dongle_id: str) -> list[Bootlog]:
+def get_bootlogs(dongle_id: str) -> List[Bootlog]:
   api = CommaApi(get_token())
   r = api.get(f'v1/devices/{dongle_id}/bootlogs')
   return [Bootlog(b) for b in r]

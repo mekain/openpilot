@@ -20,7 +20,6 @@ enum LongitudinalPersonalitySP {
 
 struct ControlsStateSP @0x81c2f05a394cf4af {
   lateralState @0 :Text;
-  personality @8 :LongitudinalPersonalitySP;
 
   lateralControlState :union {
     indiState @1 :LateralINDIState;
@@ -73,7 +72,6 @@ struct LongitudinalPlanSP @0xaedffd8f31e7b55d {
   notSpeedLimit @14 :Int16;
   e2eX @15 :List(Float32);
   e2eBlended @18 :Text;
-  e2eStatus @22 :Bool;
 
   distToTurn @7 :Float32;
   turnSpeed @8 :Float32;
@@ -83,7 +81,7 @@ struct LongitudinalPlanSP @0xaedffd8f31e7b55d {
   events @19 :List(Car.CarEvent);
   longitudinalPlanSource @20 :LongitudinalPlanSource;
 
-  personalityDEPRECATED @21 :LongitudinalPersonalitySP;
+  personality @21 :LongitudinalPersonalitySP;
 
   enum SpeedLimitControlState {
     inactive @0; # No speed limit set or not enabled by parameter.
@@ -118,15 +116,15 @@ struct LateralPlanSP @0xf35cc4560bbf6ec2 {
   rProb @2 :Float32;
 
   dProb @3 :Float32;
+  dPathWLinesX @6 :List(Float32);
+  dPathWLinesY @7 :List(Float32);
+
+  laneChangePrev @8 :Bool;
+  laneChangeEdgeBlock @10 :Bool;
 
   dynamicLaneProfile @4 :Int8;
   standstillElapsed @5 :Float32;
   dynamicLaneProfileStatus @9 :Bool;
-
-  dPathWLinesXDEPRECATED @6 :List(Float32);
-  dPathWLinesYDEPRECATED @7 :List(Float32);
-  laneChangePrevDEPRECATED @8 :Bool;
-  laneChangeEdgeBlockDEPRECATED @10 :Bool;
 }
 
 struct DriverMonitoringStateSP @0xda96579883444c35 {
@@ -177,9 +175,7 @@ struct E2eLongStateSP @0xa5cd762cd951a455 {
   status @0 :UInt16;
 }
 
-struct ModelDataV2SP @0xf98d843bfd7004a3 {
-  laneChangePrev @0 :Bool;
-  laneChangeEdgeBlock @1 :Bool;
+struct CustomReserved6 @0xf98d843bfd7004a3 {
 }
 
 struct CustomReserved7 @0xb86e6369214c01c8 {

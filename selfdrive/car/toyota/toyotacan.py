@@ -1,8 +1,3 @@
-from cereal import car
-
-SteerControlType = car.CarParams.SteerControlType
-
-
 def create_steer_command(packer, steer, steer_req):
   """Creates a CAN message for the Toyota Steer Command."""
 
@@ -14,16 +9,15 @@ def create_steer_command(packer, steer, steer_req):
   return packer.make_can_msg("STEERING_LKA", 0, values)
 
 
-def create_lta_steer_command(packer, steer_control_type, steer_angle, steer_req, frame, torque_wind_down):
+def create_lta_steer_command(packer, steer_angle, steer_req, frame, setme_x64):
   """Creates a CAN message for the Toyota LTA Steer Command."""
 
   values = {
     "COUNTER": frame + 128,
-    "SETME_X1": 1,  # suspected LTA feature availability
-    # 1 for TSS 2.5 cars, 3 for TSS 2.0. Send based on whether we're using LTA for lateral control
-    "SETME_X3": 1 if steer_control_type == SteerControlType.angle else 3,
+    "SETME_X1": 1,
+    "SETME_X3": 3,
     "PERCENTAGE": 100,
-    "TORQUE_WIND_DOWN": torque_wind_down,
+    "SETME_X64": setme_x64,
     "ANGLE": 0,
     "STEER_ANGLE_CMD": steer_angle,
     "STEER_REQUEST": steer_req,
@@ -33,12 +27,12 @@ def create_lta_steer_command(packer, steer_control_type, steer_angle, steer_req,
   return packer.make_can_msg("STEERING_LTA", 0, values)
 
 
-def create_accel_command(packer, accel, pcm_cancel, standstill_req, lead, acc_type, fcw_alert, distance, reverse_acc):
+def create_accel_command(packer, accel, pcm_cancel, standstill_req, lead, acc_type, fcw_alert, reverse_acc, gac_send):
   # TODO: find the exact canceling bit that does not create a chime
   values = {
     "ACCEL_CMD": 0 if pcm_cancel else accel,
     "ACC_TYPE": acc_type,
-    "DISTANCE": distance,
+    "DISTANCE": gac_send,
     "MINI_CAR": lead,
     "PERMIT_BRAKING": 1,
     "RELEASE_STANDSTILL": not standstill_req,
