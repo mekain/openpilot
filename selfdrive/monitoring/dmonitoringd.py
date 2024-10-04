@@ -14,7 +14,7 @@ def dmonitoringd_thread():
   params = Params()
   pm = messaging.PubMaster(['driverMonitoringState', 'driverMonitoringStateSP'])
   sm = messaging.SubMaster(['driverStateV2', 'liveCalibration', 'carState', 'controlsState', 'modelV2'], poll='driverStateV2')
-  params.put_bool_nonblocking("IsRhdDetected", False)
+
 
   DM = DriverMonitoring(rhd_saved=params.get_bool("IsRhdDetected"), always_on=params.get_bool("AlwaysOnDM"), hands_on_wheel_monitoring=params.get_bool("HandsOnWheelMonitoring"))
 
@@ -45,7 +45,7 @@ def dmonitoringd_thread():
     if (sm['driverStateV2'].frameId % 6000 == 0 and
      DM.wheelpos_learner.filtered_stat.n > DM.settings._WHEELPOS_FILTER_MIN_COUNT and
      DM.wheel_on_right == (DM.wheelpos_learner.filtered_stat.M > DM.settings._WHEELPOS_THRESHOLD)):
-      params.put_bool_nonblocking("IsRhdDetected", DM.wheel_on_right)
+      params.put_bool_nonblocking("IsRhdDetected", False)
 
 def main():
   dmonitoringd_thread()
