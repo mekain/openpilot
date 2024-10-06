@@ -38,6 +38,7 @@ def manager_init() -> None:
     ("CompletedTrainingVersion", "0"),
     ("DisengageOnAccelerator", "0"),
     ("GsmMetered", "1"),
+    ("IsMetric", "1"),
     ("HasAcceptedTerms", "0"),
     ("LanguageSetting", "main_zh-CHS"),
     ("OpenpilotEnabledToggle", "1"),
