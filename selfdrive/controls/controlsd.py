@@ -337,11 +337,11 @@ class Controls:
 
     not_running = {p.name for p in self.sm['managerState'].processes if not p.running and p.shouldBeRunning}
     if self.sm.recv_frame['managerState'] and (not_running - IGNORE_PROCESSES):
-      self.events.add(EventName.processNotRunning)
-      self.process_not_running = True
+      pass#self.events.add(EventName.processNotRunning)
+      pass#self.process_not_running = True
       if not_running != self.not_running_prev:
-        cloudlog.event("process_not_running", not_running=not_running, error=True)
-      self.not_running_prev = not_running
+        pass#cloudlog.event("process_not_running", not_running=not_running, error=True)
+      pass#self.not_running_prev = not_running
     else:
       if not SIMULATION and not self.rk.lagging:
         if not self.sm.all_alive(self.camera_packets):
