@@ -48,7 +48,7 @@ def dmonitoringd_thread():
       params.put_bool_nonblocking("IsRhdDetected", DM.wheel_on_right)
 
 def main():
-  pass#dmonitoringd_thread()
+  dmonitoringd_thread()
 
 
 if __name__ == '__main__':
