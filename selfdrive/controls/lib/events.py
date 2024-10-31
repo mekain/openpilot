@@ -192,7 +192,7 @@ class NormalPermanentAlert(Alert):
 
 
 class StartupAlert(Alert):
-  def __init__(self, alert_text_1: str, alert_text_2: str = "请注意路况，安全驾驶，这不是自动驾驶", alert_status=AlertStatus.normal):
+  def __init__(self, alert_text_1: str, alert_text_2: str = "道路千万条，安全第一条", alert_status=AlertStatus.normal):
     super().__init__(alert_text_1, alert_text_2,
                      alert_status, AlertSize.mid,
                      Priority.LOWER, VisualAlert.none, AudibleAlert.none, 5.),
@@ -417,8 +417,8 @@ EVENTS: dict[int, dict[str, Alert | AlertCallbackType]] = {
   # read-only mode. This can be solved by adding your fingerprint.
   # See https://github.com/commaai/openpilot/wiki/Fingerprinting for more information
   EventName.carUnrecognized: {
-    ET.PERMANENT: NormalPermanentAlert("目前处于行车记录仪模式",
-                                       '请点击设置⚙️ -> "车辆设置" 选择车型',
+    ET.PERMANENT: NormalPermanentAlert("欢迎使用O3智驾助手",
+                                       '请点击设置⚙️ -> "车辆设置" 选择车型后重启',
                                        priority=Priority.LOWEST),
   },
 
