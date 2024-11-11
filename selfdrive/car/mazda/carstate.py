@@ -82,7 +82,7 @@ class CarState(CarStateBase):
     ret.gasPressed = ret.gas > 0
 
     # Either due to low speed or hands off
-    lkas_blocked = cp.vl["STEER_RATE"]["LKAS_BLOCK"] == 1
+    lkas_blocked = False#cp.vl["STEER_RATE"]["LKAS_BLOCK"] == 1
 
     if self.CP.minSteerSpeed > 0:
       # LKAS is enabled at 52kph going up and disabled at 45kph going down
