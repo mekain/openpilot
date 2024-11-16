@@ -159,13 +159,13 @@ class CarState(CarStateBase):
         else:
           ret.steeringAngleDeg = steering_angle_deg
 
-    can_gear = int(cp.vl["GEAR_PACKET"]["GEAR"])
-    ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
+    #can_gear = int(cp.vl["GEAR_PACKET"]["GEAR"])
+    #ret.gearShifter = self.parse_gear_shifter(self.shifter_values.get(can_gear, None))
     ret.leftBlinker = ret.leftBlinkerOn = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 1
     ret.rightBlinker = ret.rightBlinkerOn = cp.vl["BLINKERS_STATE"]["TURN_SIGNALS"] == 2
 
-    if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
-      ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
+    #if self.CP.carFingerprint != CAR.TOYOTA_MIRAI:
+      #ret.engineRpm = cp.vl["ENGINE_RPM"]["RPM"]
 
     ret.steeringTorque = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_DRIVER"]
     ret.steeringTorqueEps = cp.vl["STEER_TORQUE_SENSOR"]["STEER_TORQUE_EPS"] * self.eps_torque_scale
@@ -224,8 +224,8 @@ class CarState(CarStateBase):
     ret.genericToggle = bool(cp.vl["LIGHT_STALK"]["AUTO_HIGH_BEAM"])
     ret.espDisabled = cp.vl["ESP_CONTROL"]["TC_DISABLED"] != 0
 
-    if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
+    #if not self.CP.enableDsu and not self.CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+      #ret.stockAeb = bool(cp_acc.vl["PRE_COLLISION"]["PRECOLLISION_ACTIVE"] and cp_acc.vl["PRE_COLLISION"]["FORCE"] < -1e-5)
 
     if self.CP.enableBsm:
       ret.leftBlindspot = (cp.vl["BSM"]["L_ADJACENT"] == 1) or (cp.vl["BSM"]["L_APPROACHING"] == 1)
@@ -346,8 +346,8 @@ class CarState(CarStateBase):
       ("STEER_TORQUE_SENSOR", 50),
     ]
 
-    if CP.carFingerprint != CAR.TOYOTA_MIRAI:
-      messages.append(("ENGINE_RPM", 42))
+    #if CP.carFingerprint != CAR.TOYOTA_MIRAI:
+      #messages.append(("ENGINE_RPM", 42))
 
     if CP.carFingerprint in UNSUPPORTED_DSU_CAR:
       messages.append(("DSU_CRUISE", 5))
@@ -371,10 +371,10 @@ class CarState(CarStateBase):
         ("PCS_HUD", 1),
       ]
 
-    if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
-      messages += [
-        ("PRE_COLLISION", 33),
-      ]
+    #if CP.carFingerprint not in (TSS2_CAR - RADAR_ACC_CAR) and not CP.enableDsu and not CP.flags & ToyotaFlags.DISABLE_RADAR.value:
+      #messages += [
+        #("PRE_COLLISION", 33),
+      #]
 
     if CP.flags & ToyotaFlags.SMART_DSU and not CP.flags & ToyotaFlags.RADAR_CAN_FILTER:
       messages += [
@@ -402,7 +402,7 @@ class CarState(CarStateBase):
 
     if CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR):
       messages += [
-        ("PRE_COLLISION", 33),
+        #("PRE_COLLISION", 33),
         ("ACC_CONTROL", 33),
         ("PCS_HUD", 1),
       ]
