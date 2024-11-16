@@ -36,7 +36,7 @@ class CarState(CarStateBase):
   def __init__(self, CP):
     super().__init__(CP)
     can_define = CANDefine(DBC[CP.carFingerprint]["pt"])
-    self.shifter_values = can_define.dv["GEAR_PACKET"]["GEAR"]
+    #self.shifter_values = can_define.dv["GEAR_PACKET"]["GEAR"]
     self.eps_torque_scale = EPS_SCALE[CP.carFingerprint] / 100.
     self.cluster_speed_hyst_gap = CV.KPH_TO_MS / 2.
     self.cluster_min_speed = CV.KPH_TO_MS / 2.
@@ -81,7 +81,7 @@ class CarState(CarStateBase):
     ret.seatbeltUnlatched = cp.vl["BODY_CONTROL_STATE"]["SEATBELT_DRIVER_UNLATCHED"] != 0
     ret.parkingBrake = cp.vl["BODY_CONTROL_STATE"]["PARKING_BRAKE"] == 1
 
-    ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
+    #ret.brakePressed = cp.vl["BRAKE_MODULE"]["BRAKE_PRESSED"] != 0
     ret.brakeHoldActive = cp.vl["ESP_CONTROL"]["BRAKE_HOLD_ACTIVE"] == 1
     ret.brakeLightsDEPRECATED = bool(cp.vl["ESP_CONTROL"]["BRAKE_LIGHTS_ACC"])
 
@@ -338,7 +338,7 @@ class CarState(CarStateBase):
       ("BODY_CONTROL_STATE_2", 2),
       ("ESP_CONTROL", 3),
       ("EPS_STATUS", 25),
-      ("BRAKE_MODULE", 40),
+      #("BRAKE_MODULE", 40),
       ("WHEEL_SPEEDS", 80),
       ("STEER_ANGLE_SENSOR", 80),
       ("PCM_CRUISE", 33),
