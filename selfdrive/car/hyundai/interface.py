@@ -133,7 +133,7 @@ class CarInterface(CarInterfaceBase):
         ret.radarUnavailable = False
 
     # *** panda safety config ***
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai)]
+    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundai),get_safety_config(car.CarParams.SafetyModel.noOutput)]
     if candidate in CANFD_CAR:
       cfgs = [get_safety_config(car.CarParams.SafetyModel.hyundaiCanfd), ]
       if CAN.ECAN >= 4:
