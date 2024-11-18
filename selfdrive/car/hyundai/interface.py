@@ -133,6 +133,7 @@ class CarInterface(CarInterfaceBase):
         ret.radarUnavailable = False
 
     # *** panda safety config ***
+    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai)]
     if candidate in CANFD_CAR:
       cfgs = [get_safety_config(car.CarParams.SafetyModel.hyundaiCanfd), ]
       if CAN.ECAN >= 4:
@@ -152,7 +153,7 @@ class CarInterface(CarInterfaceBase):
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
         ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundaiLegacy)]
       else:
-        ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai, 1)]
+        ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai)]
 
       if candidate in CAMERA_SCC_CAR:
         ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
