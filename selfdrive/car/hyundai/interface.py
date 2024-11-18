@@ -133,7 +133,7 @@ class CarInterface(CarInterfaceBase):
         ret.radarUnavailable = False
 
     # *** panda safety config ***
-    ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundai),get_safety_config(car.CarParams.SafetyModel.noOutput)]
+    #ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundai),get_safety_config(car.CarParams.SafetyModel.noOutput)]
     if candidate in CANFD_CAR:
       cfgs = [get_safety_config(car.CarParams.SafetyModel.hyundaiCanfd), ]
       if CAN.ECAN >= 4:
@@ -149,11 +149,11 @@ class CarInterface(CarInterfaceBase):
       if ret.flags & HyundaiFlags.CANFD_CAMERA_SCC:
         ret.safetyConfigs[-1].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
     else:
-      if candidate in LEGACY_SAFETY_MODE_CAR:
+      #if candidate in LEGACY_SAFETY_MODE_CAR:
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
-        ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundaiLegacy)]
-      else:
-        ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai)]
+        #ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundaiLegacy)]
+      #else:
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),get_safety_config(car.CarParams.SafetyModel.hyundai)]
 
       if candidate in CAMERA_SCC_CAR:
         ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
