@@ -70,6 +70,7 @@ def register(show_spinner=False) -> str | None:
         cloudlog.exception("failed to authenticate")
         backoff = min(backoff + 1, 15)
         time.sleep(backoff)
+        return UNREGISTERED_DONGLE_ID
 
       if time.monotonic() - start_time > 60 and show_spinner:
         return UNREGISTERED_DONGLE_ID
