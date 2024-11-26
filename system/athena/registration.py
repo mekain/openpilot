@@ -72,7 +72,7 @@ def register(show_spinner=False) -> str | None:
         time.sleep(backoff)
 
 
-      if time.monotonic() - start_time > 60 and show_spinner:
+      if time.monotonic() - start_time > 10 and show_spinner:
         return UNREGISTERED_DONGLE_ID
 
     if show_spinner:
