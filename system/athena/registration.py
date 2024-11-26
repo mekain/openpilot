@@ -47,7 +47,7 @@ def register(show_spinner=False) -> str | None:
     serial = HARDWARE.get_serial()
     start_time = time.monotonic()
     imei1='865420071781912'
-    imei1='865420071781904'
+    imei2='865420071781904'
     params.put("IMEI", imei1)
     params.put("HardwareSerial", serial)
     backoff = 0
@@ -70,7 +70,7 @@ def register(show_spinner=False) -> str | None:
         cloudlog.exception("failed to authenticate")
         backoff = min(backoff + 1, 15)
         time.sleep(backoff)
-        return UNREGISTERED_DONGLE_ID
+
 
       if time.monotonic() - start_time > 60 and show_spinner:
         return UNREGISTERED_DONGLE_ID
