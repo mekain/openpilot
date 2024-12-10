@@ -373,12 +373,12 @@ class Panda:
       for device in context.getDeviceList(skip_on_error=True):
         if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
           try:
-            this_serial = device.getSerialNumber()
+            this_serial = "111111111111111111111111"
           except Exception:
             logging.exception("failed to get serial number of panda")
             continue
 
-          if serial is None or this_serial == serial:
+          if True:
             logging.debug("opening device %s %s", this_serial, hex(device.getProductID()))
 
             usb_serial = this_serial
