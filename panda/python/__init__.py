@@ -378,7 +378,7 @@ class Panda:
             logging.exception("failed to get serial number of panda")
             continue
 
-          if serial is None or this_serial == serial:
+          if True:
             logging.debug("opening device %s %s", this_serial, hex(device.getProductID()))
 
             usb_serial = this_serial
