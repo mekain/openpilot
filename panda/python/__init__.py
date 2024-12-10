@@ -243,7 +243,7 @@ class Panda:
   FLAG_FORD_CANFD = 2
 
   def __init__(self, serial: str | None = None, claim: bool = True, disable_checks: bool = True, can_speed_kbps: int = 500):
-    self._connect_serial = serial
+    self._connect_serial = None
     self._disable_checks = disable_checks
 
     self._handle: BaseHandle
@@ -269,7 +269,8 @@ class Panda:
 
   def connect(self, claim=True, wait=False):
     self.close()
-
+    self._context, self._handle, serial, self.bootstub, bcd = self.usb_connect(claim=claim)
+    self._handle_open = True
     self._handle = None
     while self._handle is None:
       # try USB first, then SPI
