@@ -365,32 +365,45 @@ class Panda:
     return None, handle, spi_serial, bootstub, None
 
   @classmethod
-def usb_connect(cls, serial=None, claim=True):
+  def usb_connect(cls, serial, claim=True):
+    handle, usb_serial, bootstub, bcd = None, None, None, None
     context = usb1.USBContext()
-    usb_handle = None
-    usb_serial = None
-    bootstub = False
-    bcd = None
-
-    for device in context.getDeviceList(skip_on_error=True):
-        # 检查设备的 VendorID 和 ProductID
+    context.open()
+    try:
+      for device in context.getDeviceList(skip_on_error=True):
         if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
-            try:
-                handle = device.open()
-                if claim:
-                    handle.claimInterface(0)
-                
-                # 读取设备序列号（这里忽略 serial 匹配）
-                usb_serial = device.getSerialNumber()
-                usb_handle = handle
-                bootstub = device.getProductID() == cls.USB_PID_BOOTSTUB
-                bcd = device.getbcdDevice()
-                break  # 找到第一个匹配设备即可返回
-            except usb1.USBError:
-                continue
+          try:
+            this_serial = device.getSerialNumber()
+          except Exception:
+            logging.exception("failed to get serial number of panda")
+            continue
 
-    if usb_handle is None:
-        raise RuntimeError("Panda USB device not found")
+          if serial is None or this_serial == serial:
+            logging.debug("opening device %s %s", this_serial, hex(device.getProductID()))
+
+            usb_serial = this_serial
+            bootstub = (device.getProductID() & 0xF0) == 0xe0
+            handle = device.open()
+            if sys.platform not in ("win32", "cygwin", "msys", "darwin"):
+              handle.setAutoDetachKernelDriver(True)
+            if claim:
+              handle.claimInterface(0)
+              # handle.setInterfaceAltSetting(0, 0)  # Issue in USB stack
+
+            # bcdDevice wasn't always set to the hw type, ignore if it's the old constant
+            this_bcd = device.getbcdDevice()
+            if this_bcd is not None and this_bcd != 0x2300:
+              bcd = bytearray([this_bcd >> 8, ])
+
+            break
+    except Exception:
+      logging.exception("USB connect error")
+
+    usb_handle = None
+    if handle is not None:
+      usb_handle = PandaUsbHandle(handle)
+    else:
+      context.close()
 
     return context, usb_handle, usb_serial, bootstub, bcd
 
