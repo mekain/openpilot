@@ -420,6 +420,7 @@ class Panda:
       with usb1.USBContext() as context:
         for device in context.getDeviceList(skip_on_error=True):
           if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
+<<<<<<< HEAD
             pass#try:
               #serial = device.getSerialNumber()
               #if len(serial) == 24:
@@ -428,6 +429,16 @@ class Panda:
                 #logging.warning(f"found device with panda descriptors but invalid serial: {serial}", RuntimeWarning)
             #except Exception:
               #logging.exception("error connecting to panda")
+=======
+            try:
+              serial = device.getSerialNumber()
+              if len(serial) == 24:
+                ret.append(serial)
+              else:
+                logging.warning(f"found device with panda descriptors but invalid serial: {serial}", RuntimeWarning)
+            except Exception:
+              logging.exception("error connecting to panda")
+>>>>>>> parent of 757aa4f60 (Update __init__.py)
     except Exception:
       logging.exception("exception while listing pandas")
     return ret
