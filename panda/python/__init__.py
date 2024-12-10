@@ -372,13 +372,13 @@ class Panda:
     try:
       for device in context.getDeviceList(skip_on_error=True):
         if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
-          pass#try:
-            #this_serial = "111111111111111111111111"
-          #except Exception:
-            #logging.exception("failed to get serial number of panda")
+          try:
+            this_serial = device.getSerialNumber()
+          except Exception:
+            logging.exception("failed to get serial number of panda")
             continue
 
-          if True:
+          if serial is None or this_serial == serial:
             logging.debug("opening device %s %s", this_serial, hex(device.getProductID()))
 
             usb_serial = this_serial
@@ -420,16 +420,6 @@ class Panda:
       with usb1.USBContext() as context:
         for device in context.getDeviceList(skip_on_error=True):
           if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
-<<<<<<< HEAD
-            pass#try:
-              #serial = device.getSerialNumber()
-              #if len(serial) == 24:
-                #ret.append(serial)
-              #else:
-                #logging.warning(f"found device with panda descriptors but invalid serial: {serial}", RuntimeWarning)
-            #except Exception:
-              #logging.exception("error connecting to panda")
-=======
             try:
               serial = device.getSerialNumber()
               if len(serial) == 24:
@@ -438,7 +428,6 @@ class Panda:
                 logging.warning(f"found device with panda descriptors but invalid serial: {serial}", RuntimeWarning)
             except Exception:
               logging.exception("error connecting to panda")
->>>>>>> parent of 757aa4f60 (Update __init__.py)
     except Exception:
       logging.exception("exception while listing pandas")
     return ret
