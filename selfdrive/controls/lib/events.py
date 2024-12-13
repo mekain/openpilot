@@ -249,7 +249,7 @@ def calibration_incomplete_alert(CP: car.CarParams, CS: car.CarState, sm: messag
     f"{first_word} 正在进行: {sm['liveCalibration'].calPerc:.0f}%",
     f"请保持车速高于 {get_display_speed(MIN_SPEED_FILTER, metric)}",
     AlertStatus.normal, AlertSize.full,
-    Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .2)
+    Priority.LOWEST, VisualAlert.none,  AudibleAlert.warningImmediate, 2.)
 
 
 def torque_nn_load_alert(CP: car.CarParams, CS: car.CarState, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
