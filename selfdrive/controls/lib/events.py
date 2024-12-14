@@ -253,7 +253,6 @@ def below_steer_speed_alert(CP: car.CarParams, CS: car.CarState, sm: messaging.S
 
 def calibration_incomplete_alert(CP: car.CarParams, CS: car.CarState, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
   first_word = '重新校准' if sm['liveCalibration'].calStatus == log.LiveCalibrationData.Status.recalibrating else '自动校准'
-  self.panda.set_siren(True)
   return Alert(
     f"{first_word} 正在进行: {sm['liveCalibration'].calPerc:.0f}%",
     f"请保持车速高于 {get_display_speed(MIN_SPEED_FILTER, metric)}",
