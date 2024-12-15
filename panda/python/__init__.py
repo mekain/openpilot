@@ -420,6 +420,7 @@ class Panda:
       with usb1.USBContext() as context:
         for device in context.getDeviceList(skip_on_error=True):
           if device.getVendorID() == 0xbbaa and device.getProductID() in cls.USB_PIDS:
+            time.sleep(0.3)
             try:
               serial = device.getSerialNumber()
               if len(serial) == 24:
@@ -452,7 +453,7 @@ class Panda:
           self._handle.controlWrite(Panda.REQUEST_IN, 0xd8, 0, 0, b'', timeout=timeout, expect_disconnect=True)
     except Exception:
       pass
-
+    time.sleep(0.3)
     self.close()
     if not enter_bootloader and reconnect:
       self.reconnect()
